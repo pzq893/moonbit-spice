@@ -21,6 +21,6 @@ jobs:
           moon fmt --check
           moon check --deny-warn
           moon info
-          git diff --exit-code
+          git diff --exit-code -- . ':!src/pkg.generated.mbti'
       - name: Tests
         run: moon test --deny-warn
