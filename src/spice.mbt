@@ -29,6 +29,29 @@ pub struct MatrixSolver {
 }
 
 ///|
+/// Analysis modes share the same circuit model and result boundary.
+pub enum AnalysisKind {
+  Dc
+  Ac(Double)
+  Transient(Double, Double)
+}
+
+///|
+pub fn dc_analysis() -> AnalysisKind {
+  Dc
+}
+
+///|
+pub fn ac_analysis(frequency : Double) -> AnalysisKind {
+  Ac(frequency)
+}
+
+///|
+pub fn transient_analysis(step : Double, stop : Double) -> AnalysisKind {
+  Transient(step, stop)
+}
+
+///|
 /// Construct a matrix solver with a conservative singularity threshold.
 pub fn MatrixSolver::new(pivot_tolerance? : Double = 1.0e-12) -> MatrixSolver {
   { pivot_tolerance, }
@@ -57,6 +80,7 @@ pub suberror SpiceError {
   InvalidNumber(Int, String)
   DuplicateDevice(String)
   SingularMatrix(String)
+  UnsupportedAnalysis(String)
 }
 
 ///|
@@ -349,6 +373,25 @@ pub fn dc(circuit : Circuit) -> SimulationResult raise SpiceError {
     }
   }
   { node_voltages, branch_currents, warnings }
+}
+
+///|
+/// Dispatch an analysis while keeping future AC/transient additions source-compatible.
+pub fn analyze(
+  circuit : Circuit,
+  kind : AnalysisKind,
+) -> SimulationResult raise SpiceError {
+  match kind {
+    Dc => dc(circuit)
+    Ac(_) =>
+      raise SpiceError::UnsupportedAnalysis(
+        "AC small-signal analysis is planned for 0.2",
+      )
+    Transient(_, _) =>
+      raise SpiceError::UnsupportedAnalysis(
+        "transient analysis is planned for 0.3",
+      )
+  }
 }
 
 ///|
