@@ -1,0 +1,75 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "pzqstudy/moonbit-spice/src"
+
+// Values
+pub fn ac_analysis(Double) -> AnalysisKind
+
+pub fn analyze(Circuit, AnalysisKind) -> SimulationResult raise SpiceError
+
+pub fn dc(Circuit) -> SimulationResult raise SpiceError
+
+pub fn dc_analysis() -> AnalysisKind
+
+pub fn parse_netlist(String) -> Circuit raise SpiceError
+
+pub fn transient_analysis(Double, Double) -> AnalysisKind
+
+// Errors
+pub suberror SpiceError {
+  EmptyNetlist
+  InvalidLine(Int, String)
+  InvalidNumber(Int, String)
+  DuplicateDevice(String)
+  SingularMatrix(String)
+  UnsupportedAnalysis(String)
+}
+
+// Types and methods
+pub enum AnalysisKind {
+  Dc
+  Ac(Double)
+  Transient(Double, Double)
+}
+
+pub struct BranchCurrent {
+  name : String
+  current : Double
+}
+
+pub struct Circuit {
+  nodes : Array[String]
+  devices : Array[Device]
+}
+
+pub enum Device {
+  Resistor(String, String, String, Double)
+  Capacitor(String, String, String, Double)
+  Inductor(String, String, String, Double)
+  Diode(String, String, String, Double, Double)
+  CurrentSource(String, String, String, Double)
+  VoltageSource(String, String, String, Double)
+}
+
+pub struct MatrixSolver {
+  pivot_tolerance : Double
+}
+pub fn MatrixSolver::new(pivot_tolerance? : Double) -> Self
+pub fn MatrixSolver::solve(Self, Array[Array[Double]], Array[Double]) -> Array[Double] raise SpiceError
+
+pub struct NodeVoltage {
+  name : String
+  voltage : Double
+}
+
+pub struct SimulationResult {
+  node_voltages : Array[NodeVoltage]
+  branch_currents : Array[BranchCurrent]
+  warnings : Array[String]
+}
+pub fn SimulationResult::summary(Self) -> String
+pub fn SimulationResult::to_csv(Self) -> String
+
+// Type aliases
+
+// Traits
+
