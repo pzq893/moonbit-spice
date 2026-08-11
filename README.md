@@ -7,6 +7,7 @@
 - 网表解析：电阻、电容、电感、二极管、独立电压源和电流源；支持 `k`、`meg`、`m`、`u`、`n`、`p` 工程后缀。
 - DC 工作点：基于改进节点分析（MNA）和带部分选主元的高斯消元。
 - 结果 API：结构化 `Circuit`、`Device`、`SimulationResult`，以及 CSV 和教学友好的文本报告。
+- 分析入口：`analyze`、`dc_analysis`、`ac_analysis`、`transient_analysis` 形成稳定的分析模式边界；当前可执行实现为 DC，AC/瞬态会返回明确的路线状态错误。
 - 诊断：重复器件名、非法数值、缺少节点、浮置节点/奇异矩阵会返回明确错误；电容、电感、二极管的 DC 近似会记录 warning。
 
 ## 快速开始
