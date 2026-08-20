@@ -1,0 +1,6 @@
+V1 in 0 12
+I1 out 0 2m
+R1 in out 4k
+C1 out 0 10u
+L1 out 0 1m
+D1 out 0 0.7

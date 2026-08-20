@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added matrix residuals and statistics, circuit topology inventory, deterministic
+  sweeps, transient grids, complex-value helpers, and Markdown reports.
+- Added a dependency-free CLI smoke example and reproducible benchmark fixtures.
+- Expanded boundary tests and refreshed multi-platform CI expectations.
+
 ## 0.1.0 - 2026-08-11
 
 - 建立纯 MoonBit 的网表、器件和仿真结果模型。

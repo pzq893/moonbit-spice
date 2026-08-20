@@ -1,24 +1,97 @@
-# moonbit-SPICE
+# moonbit-spice
 
-可扩展的纯 MoonBit 电路仿真内核，面向模拟电子、电源和教学实验。项目输入 SPICE-like 网表，输出节点电压、源支路电流和可解释的诊断信息。
+`moonbit-spice` is a reusable SPICE-like circuit analysis library written in
+MoonBit. It turns a readable netlist into a validated circuit model, assembles
+modified nodal analysis (MNA) equations, solves the operating point, and emits
+structured results for teaching tools, design utilities, scripts, and future
+WASM front ends.
 
-## 当前能力
+## Core capabilities
 
-- 网表解析：电阻、电容、电感、二极管、独立电压源和电流源；支持 `k`、`meg`、`m`、`u`、`n`、`p` 工程后缀。
-- DC 工作点：基于改进节点分析（MNA）和带部分选主元的高斯消元。
-- 结果 API：结构化 `Circuit`、`Device`、`SimulationResult`，以及 CSV 和教学友好的文本报告。
-- 分析入口：`analyze`、`dc_analysis`、`ac_analysis`、`transient_analysis` 形成稳定的分析模式边界；当前可执行实现为 DC，AC/瞬态会返回明确的路线状态错误。
-- 诊断：重复器件名、非法数值、缺少节点、浮置节点/奇异矩阵会返回明确错误；电容、电感、二极管的 DC 近似会记录 warning。
+- SPICE-like parsing with blank lines, comments, directives, duplicate-name
+  detection, and engineering suffixes (`k`, `meg`, `m`, `u`, `n`, `p`).
+- Resistors, capacitors, inductors, diodes, independent current sources, and
+  independent voltage sources.
+- Dense MNA with partial pivoting, residual diagnostics, singular-system
+  reporting, deterministic node ordering, and circuit topology inventory.
+- DC operating-point analysis with explicit warnings for DC approximations.
+- Reusable matrix/vector utilities, time grids and integration primitives,
+  deterministic parameter sweeps, complex-value helpers, and result reports.
+- CSV, text, and Markdown output that can be consumed by a CLI or a notebook.
 
-## 快速开始
+The implementation is intentionally explicit about model boundaries. AC and
+full nonlinear/transient circuit solves are represented by extension points and
+small reusable kernels; the library does not fabricate results for analyses it
+does not yet solve physically.
+
+## Quick start
 
 ```moonbit nocheck
-let circuit = @spice.parse_netlist("V1 in 0 10\\nR1 in out 1k\\nR2 out 0 1k")
+let circuit = @spice.parse_netlist(
+  "V1 in 0 10\nR1 in out 1k\nR2 out 0 1k",
+)
 let result = @spice.dc(circuit)
 println(result.summary())
 ```
 
-示例网表见 [`examples/voltage-divider.cir`](examples/voltage-divider.cir)。在仓库根目录运行：
+From the repository root:
+
+```bash
+moon fmt --check
+moon check --deny-warn
+moon test --deny-warn
+moon run cmd/spice
+```
+
+The sample input is also available at
+[`examples/voltage-divider.cir`](examples/voltage-divider.cir).
+
+## CLI
+
+`moon run cmd/spice` runs a deterministic voltage-divider smoke example and
+prints a Markdown report. It is deliberately dependency-free so a fresh MoonBit
+checkout can run it without a package manager or native runtime library.
+
+The library API is the stable integration surface. Applications can read a file,
+call `parse_netlist`, choose `dc` or `analyze`, and serialize with
+`report_csv`, `report_markdown`, or `SimulationResult::summary`.
+
+## Architecture
+
+```text
+netlist text
+    -> parser and validation
+    -> Circuit / Device model
+    -> MNA stamping
+    -> DenseMatrix + MatrixSolver
+    -> SimulationResult
+    -> CSV / text / Markdown report
+```
+
+The `src/` package keeps public data structures and the analysis boundary in one
+place. Matrix, topology, sweep, transient, complex-value, reporting, and
+benchmark utilities are split into focused files so callers can reuse the
+smallest useful unit.
+
+## Benchmarks
+
+The reproducible fixtures and commands live in [`benchmarks/`](benchmarks/).
+They measure the real parser, MNA, topology, and formatting path. Run:
+
+```powershell
+Measure-Command { moon test --deny-warn }
+moon run cmd/spice
+```
+
+Timings depend on the host and toolchain. CI stores the command output as an
+artifact instead of presenting an unrepeatable number as a universal claim.
+
+## Tests and boundary coverage
+
+Tests cover voltage-divider and current-source solutions, suffix parsing,
+duplicate devices, result exports, matrix residuals, topology connectivity,
+ordered sweeps, invalid transient grids, and Markdown report metadata. The
+stricter local gate is:
 
 ```bash
 moon fmt --check
@@ -27,18 +100,15 @@ moon test --deny-warn
 moon info
 ```
 
-## 设计边界与路线
+## CI
 
-`Device` 描述物理元件，MNA 组装和矩阵求解保持独立，`SimulationResult` 作为分析结果边界。下一阶段将加入复数矩阵与 AC 小信号、带状态变量的瞬态积分、二极管 Newton 迭代、JSON 输出和原生 CLI；随后扩展 BJT/MOSFET、参数扫描、蒙特卡洛和 WASM 波形展示。每项扩展都先补充标准算例与 ngspice/LTspice 交叉验证。
+GitHub Actions runs the current MoonBit installer on Ubuntu, macOS, and Windows.
+It checks all targets, formatting, public interface generation, warnings, tests,
+and the CLI smoke path. A separate workflow records deterministic benchmark
+artifacts. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-## 与 MoonElec 的区别
+## License
 
-MoonElec 侧重电工公式、阻抗和工程计算；moonbit-SPICE 侧重“网表 → 矩阵 → 求解 → 波形/结果”的仿真流水线，提供可插拔器件和分析器的基础 API。
-
-## 开源与来源
-
-代码为本项目原创 MoonBit 实现，采用 MIT License。算法依据经典 MNA/线性电路分析教材实现；`examples/` 中的电路为教学算例，不复制第三方源码。项目不依赖 MoonElec 代码。
-
-## 参赛项目
-
-项目标识：`moonbit-spice`。这是 MoonBit 2026 年 8 月黑客松的参赛项目，开发过程公开保留在 GitHub 与 GitLink。
+Released under the [MIT License](LICENSE). The project is an independent
+MoonBit implementation. The example circuits are small educational fixtures and
+do not include copied third-party source or proprietary model files.

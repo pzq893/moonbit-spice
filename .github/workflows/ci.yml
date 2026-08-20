@@ -1,26 +1,56 @@
-name: MoonBit CI
+name: Check and Test
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    name: MoonBit (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install MoonBit 0.10.3 toolchain
+        with:
+          persist-credentials: false
+
+      - name: Install MoonBit on Unix
+        if: runner.os != 'Windows'
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.moon/bin:$PATH"
-          moon version
-      - name: Format and interface checks
+
+      - name: Install MoonBit on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+          "$HOME/.moon/bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Toolchain
+        run: |
+          moon version --all
+          moon update
+
+      - name: Format, check, and interface
         run: |
           moon fmt --check
-          moon check --deny-warn
+          moon check --deny-warn --target all
           moon info
           git diff --exit-code -- . ':!src/pkg.generated.mbti'
+
       - name: Tests
-        run: moon test --deny-warn
+        run: moon test --deny-warn --target all
+
+      - name: CLI smoke test
+        run: moon run cmd/spice

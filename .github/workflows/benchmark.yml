@@ -1,0 +1,37 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Record reproducible benchmark
+        run: |
+          {
+            echo "toolchain="
+            moon version --all
+            echo "tests="
+            /usr/bin/time -v moon test --deny-warn
+            echo "cli="
+            /usr/bin/time -v moon run cmd/spice
+          } 2>&1 | tee benchmark-output.txt
+      - name: Upload benchmark output
+        uses: actions/upload-artifact@v4
+        with:
+          name: moonbit-spice-benchmark
+          path: benchmark-output.txt

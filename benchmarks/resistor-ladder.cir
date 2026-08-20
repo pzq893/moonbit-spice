@@ -1,0 +1,6 @@
+V1 n0 0 5
+R1 n0 n1 1k
+R2 n1 n2 2k
+R3 n2 n3 3k
+R4 n3 n4 4k
+R5 n4 0 5k
