@@ -1,0 +1,5 @@
+import {
+  "pzq893/moonbit-spice/src",
+}
+
+pkgtype(kind: "executable")

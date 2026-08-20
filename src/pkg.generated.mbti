@@ -1,18 +1,114 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "pzqstudy/moonbit-spice/src"
+package "pzq893/moonbit-spice/src"
 
 // Values
 pub fn ac_analysis(Double) -> AnalysisKind
 
+pub fn ac_kernel_checksum(Double, Double, Double) -> Double
+
+pub fn analysis_kernel_checksum(Double, Double) -> Double
+
 pub fn analyze(Circuit, AnalysisKind) -> SimulationResult raise SpiceError
+
+pub fn benchmark_kernel_checksum(Double, Double) -> Double
+
+pub fn complex_admittance(ComplexValue) -> ComplexValue
+
+pub fn complex_average(Array[ComplexValue]) -> ComplexValue
+
+pub fn complex_imaginary_projection(Array[ComplexValue]) -> Array[Double]
+
+pub fn complex_impedance(Double, Double) -> ComplexValue
+
+pub fn complex_max_magnitude(Array[ComplexValue]) -> Double
+
+pub fn complex_phase_ratio(ComplexValue) -> Double
+
+pub fn complex_power(ComplexValue, ComplexValue) -> ComplexValue
+
+pub fn complex_real_projection(Array[ComplexValue]) -> Array[Double]
+
+pub fn complex_series(Array[Double], Double) -> Array[ComplexValue]
+
+pub fn complex_to_csv(Array[ComplexValue]) -> String
 
 pub fn dc(Circuit) -> SimulationResult raise SpiceError
 
 pub fn dc_analysis() -> AnalysisKind
 
+pub fn device_kernel_checksum(Double, Double) -> Double
+
+pub fn matrix_vector_dot(Array[Double], Array[Double]) -> Double
+
 pub fn parse_netlist(String) -> Circuit raise SpiceError
 
+pub fn report_csv(Circuit, SimulationResult) -> String
+
+pub fn report_kernel_checksum(Double, Double) -> Double
+
+pub fn report_markdown(Circuit, SimulationResult) -> String
+
+pub fn series_kernel_checksum(Double, Double) -> Double
+
+pub fn simulation_kernel_checksum(Double, Double) -> Double
+
+pub fn solver_kernel_checksum(Double, Double) -> Double
+
+pub fn sweep_average(Array[SweepPoint]) -> Double
+
+pub fn sweep_filter(Array[SweepPoint], (SweepPoint) -> Bool) -> Array[SweepPoint]
+
+pub fn sweep_interpolate(Array[SweepPoint], Double) -> Double
+
+pub fn sweep_linear(Double, Double, Double) -> Array[Double]
+
+pub fn sweep_map(Array[Double], (Double) -> Double) -> Array[Double]
+
+pub fn sweep_maximum(Array[SweepPoint]) -> SweepPoint?
+
+pub fn sweep_minimum(Array[SweepPoint]) -> SweepPoint?
+
+pub fn sweep_points(Array[Double], (Double) -> Double) -> Array[SweepPoint]
+
+pub fn sweep_range(Array[SweepPoint]) -> Double
+
+pub fn sweep_scale(Array[SweepPoint], Double) -> Array[SweepPoint]
+
+pub fn sweep_to_csv(Array[SweepPoint]) -> String
+
+pub fn time_grid(Double, Double, Double) -> Array[Double] raise SpiceError
+
+pub fn topology_kernel_checksum(Double, Double) -> Double
+
 pub fn transient_analysis(Double, Double) -> AnalysisKind
+
+pub fn transient_decay(Double, Double, Double) -> Double
+
+pub fn transient_euler(Double, Double, Double) -> Double
+
+pub fn transient_hold(Double, Double) -> Double
+
+pub fn transient_ramp(Double, Double, Double, Double) -> Double
+
+pub fn transient_sample_at(TransientSeries, Double) -> TimeSample?
+
+pub fn transient_sine(Double, Double, Double) -> Double
+
+pub fn transient_trapezoid(Double, Double, Double, Double) -> Double
+
+pub fn validation_kernel_checksum(Double, Double) -> Double
+
+pub fn vector_distance(Array[Double], Array[Double]) -> Double
+
+pub fn vector_max(Array[Double]) -> Double
+
+pub fn vector_mean(Array[Double]) -> Double
+
+pub fn vector_min(Array[Double]) -> Double
+
+pub fn vector_norm(Array[Double]) -> Double
+
+pub fn vector_sum(Array[Double]) -> Double
 
 // Errors
 pub suberror SpiceError {
@@ -40,6 +136,66 @@ pub struct Circuit {
   nodes : Array[String]
   devices : Array[Device]
 }
+pub fn Circuit::connected_components(Self) -> Int
+pub fn Circuit::contains_device(Self, String) -> Bool
+pub fn Circuit::device_names(Self) -> Array[String]
+pub fn Circuit::has_ground_reference(Self) -> Bool
+pub fn Circuit::inventory(Self) -> CircuitInventory
+pub fn Circuit::isolated_nodes(Self) -> Array[String]
+pub fn Circuit::maximum_resistance(Self) -> Double
+pub fn Circuit::minimum_resistance(Self) -> Double
+pub fn Circuit::node_degree(Self, String) -> Int
+pub fn Circuit::resistance_values(Self) -> Array[Double]
+pub fn Circuit::total_resistance(Self) -> Double
+
+pub struct CircuitInventory {
+  device_count : Int
+  node_count : Int
+  resistor_count : Int
+  capacitor_count : Int
+  inductor_count : Int
+  diode_count : Int
+  source_count : Int
+}
+
+pub struct ComplexValue {
+  real : Double
+  imaginary : Double
+}
+pub fn ComplexValue::add(Self, Self) -> Self
+pub fn ComplexValue::conjugate(Self) -> Self
+pub fn ComplexValue::is_zero(Self, tolerance? : Double) -> Bool
+pub fn ComplexValue::magnitude(Self) -> Double
+pub fn ComplexValue::mul(Self, Self) -> Self
+pub fn ComplexValue::new(Double, Double) -> Self
+pub fn ComplexValue::scale(Self, Double) -> Self
+pub fn ComplexValue::sub(Self, Self) -> Self
+
+pub struct DenseMatrix {
+  data : Array[Array[Double]]
+}
+pub fn DenseMatrix::add(Self, Self) -> Self
+pub fn DenseMatrix::clamp(Self, Double, Double) -> Self
+pub fn DenseMatrix::column_count(Self) -> Int
+pub fn DenseMatrix::diagonal(Self) -> Array[Double]
+pub fn DenseMatrix::flatten(Self) -> Array[Double]
+pub fn DenseMatrix::from_rows(Array[Array[Double]]) -> Self
+pub fn DenseMatrix::get(Self, Int, Int) -> Double
+pub fn DenseMatrix::identity(Int) -> Self
+pub fn DenseMatrix::is_square(Self) -> Bool
+pub fn DenseMatrix::is_symmetric(Self, tolerance? : Double) -> Bool
+pub fn DenseMatrix::map(Self, (Double) -> Double) -> Self
+pub fn DenseMatrix::multiply_vector(Self, Array[Double]) -> Array[Double]
+pub fn DenseMatrix::residual(Self, Array[Double], Array[Double]) -> Double
+pub fn DenseMatrix::row_count(Self) -> Int
+pub fn DenseMatrix::rows(Self) -> Array[Array[Double]]
+pub fn DenseMatrix::scale(Self, Double) -> Self
+pub fn DenseMatrix::set(Self, Int, Int, Double) -> Unit
+pub fn DenseMatrix::stats(Self) -> MatrixStats
+pub fn DenseMatrix::to_csv(Self) -> String
+pub fn DenseMatrix::trace(Self) -> Double
+pub fn DenseMatrix::transpose(Self) -> Self
+pub fn DenseMatrix::zeros(Int, Int) -> Self
 
 pub enum Device {
   Resistor(String, String, String, Double)
@@ -56,10 +212,31 @@ pub struct MatrixSolver {
 pub fn MatrixSolver::new(pivot_tolerance? : Double) -> Self
 pub fn MatrixSolver::solve(Self, Array[Array[Double]], Array[Double]) -> Array[Double] raise SpiceError
 
+pub struct MatrixStats {
+  rows : Int
+  columns : Int
+  non_zero : Int
+  frobenius_norm : Double
+  max_abs : Double
+}
+
 pub struct NodeVoltage {
   name : String
   voltage : Double
 }
+
+pub struct Report {
+  circuit : Circuit
+  result : SimulationResult
+}
+pub fn Report::csv(Self) -> String
+pub fn Report::from_result(Circuit, SimulationResult) -> Self
+pub fn Report::has_warnings(Self) -> Bool
+pub fn Report::inventory(Self) -> CircuitInventory
+pub fn Report::is_connected(Self) -> Bool
+pub fn Report::markdown(Self) -> String
+pub fn Report::summary(Self) -> String
+pub fn Report::warning_count(Self) -> Int
 
 pub struct SimulationResult {
   node_voltages : Array[NodeVoltage]
@@ -69,7 +246,25 @@ pub struct SimulationResult {
 pub fn SimulationResult::summary(Self) -> String
 pub fn SimulationResult::to_csv(Self) -> String
 
+pub struct SweepPoint {
+  parameter : Double
+  value : Double
+}
+
+pub struct TimeSample {
+  time : Double
+  values : Array[Double]
+}
+
+pub struct TransientSeries {
+  samples : Array[TimeSample]
+  step : Double
+  stop : Double
+}
+pub fn TransientSeries::new(Double, Double, Double) -> Self raise SpiceError
+pub fn TransientSeries::push(Self, Double, Array[Double]) -> Unit
+pub fn TransientSeries::sample_count(Self) -> Int
+
 // Type aliases
 
 // Traits
-
